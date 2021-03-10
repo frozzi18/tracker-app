@@ -4,7 +4,7 @@ services:
 
 before_install:
   - docker build -t frozzi18/react-test -f ./client/Dockerfile.dev ./client
-  # - docker build run other
+  # - docker build run other test
   # Log in to docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # Install heroku CLI
