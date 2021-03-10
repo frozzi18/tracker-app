@@ -1,8 +1,8 @@
-# Exercise tracker app using MERN
+# Exercise tracker app using MERN with docker.
 
 Tha app has capability to track your duration time in the activities.
 
-It can be accessed with this [link](https://competent-davinci-1225c2.netlify.app/)
+It can be accessed with this [link](https://tracker-list-nginx.herokuapp.com/)
 
 <!-- # Getting Started with Create React App
 
