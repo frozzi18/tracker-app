@@ -1,46 +1,85 @@
 sudo: required
+language: node_js 
+node_js: 
+  - "9"
 services:
   - docker
 
 before_install:
-  - docker build -t frozzi18/react-test -f ./client/Dockerfile.dev ./client
-  # - docker build run other test
-  # Log in to docker CLI
+  - wget -qO- https://toolbelt.heroku.com/install.sh | sh
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Install heroku CLI
-  - wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
   - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
-  
+
 script:
-  - docker run -e CI=true frozzi18/react-test npm test
-  # Run other test, put here
-  - docker build -t frozzi18/tracker_client ./client
-  - docker tag frozzi18/tracker_client registry.heroku.com/$HEROKU_APP_NAME/web
-
-  
-
-# after_success:  
-#   - docker build -t frozzi18/web ./nginx
-#   - docker build -t frozzi18/tracker_server ./server
-  
-  # Take those image and push them to docker hub
-  
-  # - docker push frozzi18/web
-  # - docker push frozzi18/tracker_server
-  # deploy to heroku
-  # - wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
-  # - heroku plugins:install @heroku-cli/plugin-container-registry
-  # - docker login --username _ --password=$HEROKU_API_KEY registry.heroku.com
-  # - heroku container:push tracker_client web tracker_server --recursive --app $HEROKU_APP_NAME
-  # - heroku container:release tracker_client web tracker_server --app $HEROKU_APP_NAME
-  # - heroku ps:scale tracker_client=1 web=1 tracker_server=1 --app $HEROKU_APP_NAME
-
+  - docker build -t frozzi18/docker_client ./client;
+  - docker tag frozzi18/docker_client registry.heroku.com/$HEROKU_APP_FRONT_NAME/web;
+  - docker build -t frozzi18/docker_backend ./server;
+  - docker tag frozzi18/docker_backend registry.heroku.com/$HEROKU_APP_BACK_NAME/web;
+  - docker build -t frozzi18/docker_nginx ./nginx;
+  - docker tag frozzi18/docker_nginx registry.heroku.com/$HEROKU_APP_NGINX_NAME/web;
 
 deploy:
   provider: script
-  script:
-    docker push frozzi18/tracker_client;
-    docker push registry.heroku.com/$HEROKU_APP_NAME/web;
-    heroku container: release web --app $HEROKU_APP_NAME
-  on:
+  script: 
+    # push to dockerhub & heroku 
+    docker push frozzi18/docker_client;
+    docker push registry.heroku.com/$HEROKU_APP_FRONT_NAME/web;
+    heroku container:release web --app $HEROKU_APP_FRONT_NAME;
+    docker push frozzi18/docker_backend;
+    docker push registry.heroku.com/$HEROKU_APP_BACK_NAME/web;
+    heroku container:release web --app $HEROKU_APP_BACK_NAME;
+    docker push frozzi18/docker_nginx;
+    docker push registry.heroku.com/$HEROKU_APP_NGINX_NAME/web;
+    heroku container:release web --app $HEROKU_APP_NGINX_NAME;
+  on: 
     branch: master
+
+
+
+
+# sudo: required
+# services:
+#   - docker
+
+# before_install:
+#   - docker build -t frozzi18/react-test -f ./client/Dockerfile.dev ./client
+#   # - docker build run other test
+#   # Log in to docker CLI
+#   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+#   # Install heroku CLI
+#   - wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+#   - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
+  
+# script:
+#   - docker run -e CI=true frozzi18/react-test npm test
+#   # Run other test, put here
+#   - docker build -t frozzi18/tracker_client ./client
+#   - docker tag frozzi18/tracker_client registry.heroku.com/$HEROKU_APP_NAME/web
+
+  
+
+# # after_success:  
+# #   - docker build -t frozzi18/web ./nginx
+# #   - docker build -t frozzi18/tracker_server ./server
+  
+#   # Take those image and push them to docker hub
+  
+#   # - docker push frozzi18/web
+#   # - docker push frozzi18/tracker_server
+#   # deploy to heroku
+#   # - wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+#   # - heroku plugins:install @heroku-cli/plugin-container-registry
+#   # - docker login --username _ --password=$HEROKU_API_KEY registry.heroku.com
+#   # - heroku container:push tracker_client web tracker_server --recursive --app $HEROKU_APP_NAME
+#   # - heroku container:release tracker_client web tracker_server --app $HEROKU_APP_NAME
+#   # - heroku ps:scale tracker_client=1 web=1 tracker_server=1 --app $HEROKU_APP_NAME
+
+
+# deploy:
+#   provider: script
+#   script:
+#     docker push frozzi18/tracker_client;
+#     docker push registry.heroku.com/$HEROKU_APP_NAME/web;
+#     heroku container: release web --app $HEROKU_APP_NAME
+#   on:
+#     branch: master
