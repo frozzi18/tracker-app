@@ -1,6 +1,6 @@
 # Exercise tracker app using MERN with docker.
 
-Tha app has capability to track your duration time in the activities.
+The app has capability to track your duration time in the activities.
 
 It can be accessed with this [link](https://tracker-list-nginx.herokuapp.com/)
 
